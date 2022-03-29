@@ -64,9 +64,9 @@
                 </form>
             </div>
 
-            <div class="column" name="insertOrderColumn">
+        <!--    <div class="column" name="insertOrderColumn">
                 <h3>Insert Values into Order</h3>
-                <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
+                <form method="POST" action="uber_dash_DBMS.php">
                     <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
                     Order Number: <input type="text" name="insOrderNo"> <br /><br />
                     Order Price: <input type="text" name="insOrderPrice"> <br /><br />
@@ -78,7 +78,7 @@
                     <input type="submit" value="Insert" name="insertSubmit"></p>
                 </form>
             </div>
-            
+        -->    
         </div>
 
         <hr />
@@ -348,28 +348,36 @@
             OCICommit($db_conn);
         }
 
-        function handleInsertOrderRequest() {
-            global $db_conn;
+        // function handleInsertOrderRequest() {
+        //     global $db_conn;
 
-            //Getting the values from user and insert data into the table
-            $tuple = array (
-                ":bind1" => $_POST['insOrderNo'],
-                ":bind2" => $_POST['insOrderPrice'],
-                ":bind3" => $_POST['insOrderTime'],
-                ":bind4" => $_POST['insOrderAU'],
-                ":bind5" => $_POST['insOrderFPName'],
-                ":bind6" => $_POST['insOrderFPLoc']
-            );
+        //     //Getting the values from user and insert data into the table
+        //     $tuple = array (
+        //         ":bind1" => $_POST['insOrderNo'],
+        //         ":bind2" => $_POST['insOrderPrice'],
+        //         ":bind3" => $_POST['insOrderTime'],
+        //         ":bind4" => $_POST['insOrderAU'],
+        //         ":bind5" => $_POST['insOrderFPName'],
+        //         ":bind6" => $_POST['insOrderFPLoc']
+        //     );
 
-            $alltuples = array (
-                $tuple
-            );
+        //     $alltuples = array (
+        //         $tuple
+        //     );
 
+<<<<<<< HEAD
+        //     executeBoundSQL("insert into funkyOrder values (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
+        //     OCICommit($db_conn);
+        // }
+/////////////////////////////////////////////////////////////
+        function handleCountRequest() {
+=======
             executeBoundSQL("insert into funkyOrder values (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
             OCICommit($db_conn);
         }
 
         function handleAverageRequest() {
+>>>>>>> 00b4cc79f0dcfc2cc9ea6683447a813a8b9b5892
             global $db_conn;
 
             $result = executePlainSQL("SELECT AVG(order_price) FROM funkyOrder");
