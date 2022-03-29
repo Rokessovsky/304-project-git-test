@@ -345,19 +345,11 @@
         //         $tuple
         //     );
 
-<<<<<<< HEAD
         //     executeBoundSQL("insert into funkyOrder values (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
         //     OCICommit($db_conn);
         // }
 /////////////////////////////////////////////////////////////
         function handleCountRequest() {
-=======
-            executeBoundSQL("insert into funkyOrder values (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
-            OCICommit($db_conn);
-        }
-
-        function handleAverageRequest() {
->>>>>>> 00b4cc79f0dcfc2cc9ea6683447a813a8b9b5892
             global $db_conn;
 
             $result = executePlainSQL("SELECT AVG(order_price) FROM funkyOrder");
@@ -380,9 +372,10 @@
                         handleInsertCusRequest();
                     } else if (array_key_exists('insFPName', $_POST)) {
                         handleInsertFPRequest();
-                    } else if (array_key_exists('insOrderNo', $_POST)) {
-                        handleInsertOrderRequest();
-                    }
+                    } 
+                    // else if (array_key_exists('insOrderNo', $_POST)) {
+                    //     handleInsertOrderRequest();
+                    // }
                 } else if (array_key_exists('deleteQueryRequest', $_POST)){
                     handleDeleteRequest();
                 }
