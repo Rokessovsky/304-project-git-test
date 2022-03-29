@@ -97,6 +97,23 @@
 
         <hr />
 
+
+        <h2>Projection </h2>
+        <form method="GET" action="uber_dash_DBMS.php">
+            <input type="hidden" id="projectionQueryRequest" name="projectionQueryRequest">
+            <label for="OrderAttribute">Choose an attribute from Order:</label>
+                <select name="OrderAttribute" id="OrderAttribute">
+                <option value="select">select</option> 
+                <option value="see_all">All</option>    
+                <option value="order_number">Order Number</option>
+                <option value="order_price">Price</option>
+                <option value="account_username">Username</option>
+                <option value="food_provider_name">Food Provider</option>
+                </select>
+            <input type="submit" value="select" name="project"></p>
+        </form>   
+        <hr />
+
         <h2>Select all name in DemoTable</h2>
 
         <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
@@ -199,13 +216,41 @@
             echo "</table>";
         }
 
+        function printProjectionResult($result,$case){
+            echo "<br>Retrieved data from table FunkyOrder:<br>";
+            echo "<table>";
+        
+            if($case==1){ //ALL
+                echo "<tr><th>order_number</th><th>price</th><th>time</th><th>username</th><th>food_provider_name</th><th>food_provider_location</th></tr>";
+            }else if($case==2){ 
+                echo "<tr><th>order_number</th></tr>";
+            }else if($case==3){ 
+                echo "<tr><th>order_price</th></tr>";
+            }else if($case==4){ 
+                echo "<tr><th>account_username</th></tr>";
+            }else if($case==5){ 
+                echo "<tr><th>food_provider_name</th></tr>";
+            }
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                if($case==1){
+                    echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td> <td>" . $row[2] . "</td><td>" . $row[3] . "</td><td>" . $row[4] . "</td><td>" . $row[5] . "</td><td>" . $row[6] . "</td></tr>";             
+                }else {
+                    echo "<tr><td>" . $row[0] . "</td></tr>";
+                }
+            }
+            
+            
+            
+            echo "</table>";
+        }
+
         function connectToDB() {
             global $db_conn;
 
             // Your username is ora_(CWL_ID) and the password is a(student number). For example,
 			// ora_platypus is the username and a12345678 is the password.
             $db_conn = OCILogon("ora_smethven", "a11305109", "dbhost.students.cs.ubc.ca:1522/stu");
-
+            //$db_conn = OCILogon("ora_zqz827", "a66474206", "dbhost.students.cs.ubc.ca:1522/stu");
             if ($db_conn) {
                 debugAlertMessage("Database is Connected");
                 return true;
@@ -250,6 +295,33 @@
             // you need the wrap the old name and new name values with single quotations
             $result = executePlainSQL("SELECT * FROM demoTable");
             printResult($result);
+            OCICommit($db_conn);
+        }
+        function handleProjectRequest(){
+            global $db_conn;
+            
+            //if($_GET['OrderAttribute']=='see_all'){
+            if(!empty($_GET['OrderAttribute'])){
+                $selected = $_GET['OrderAttribute'];
+                if($selected=='see_all'){
+                    $result = executePlainSQL("SELECT * FROM funkyOrder");
+                    $case=1;
+               }else if($selected=='order_number'){
+                    $result = executePlainSQL("SELECT order_number FROM funkyOrder");
+                    $case=2;
+               }else if($selected=='order_price'){
+                    $result = executePlainSQL("SELECT distinct order_price FROM funkyOrder");
+                    $case=3;
+               }else if($selected=='account_username'){
+                    $result = executePlainSQL("SELECT distinct account_username FROM funkyOrder");
+                    $case=4;
+               }else if($selected=='food_provider_name'){
+                    $result = executePlainSQL("SELECT distinct food_provider_name FROM funkyOrder");
+                    $case=5;
+                }
+            }
+            
+            printProjectionResult($result,$case);
             OCICommit($db_conn);
         }
 
@@ -313,7 +385,8 @@
             $tuple = array (
                 ":bind1" => $_POST['insOrderNo'],
                 ":bind2" => $_POST['insOrderPrice'],
-                ":bind3" => $_POST['insOrderTime'],
+                //":bind3" => $_POST['insOrderTime'],
+                ":bind3" =>  TO_TIMESTAMP('YYYY-MM-DD HH24:MI:SS'),
                 ":bind4" => $_POST['insOrderAU'],
                 ":bind5" => $_POST['insOrderFPName'],
                 ":bind6" => $_POST['insOrderFPLoc']
@@ -348,16 +421,7 @@
                 } else if (array_key_exists('insertQueryRequest', $_POST)) {
                     if(array_key_exists('insCusAU', $_POST)) {
                         handleInsertCusRequest();
-<<<<<<< HEAD
                     }                   
-=======
-                    } else if (array_key_exists('insFPName', $_POST)) {
-                        handleInsertFPRequest();
-                    } else if (array_key_exists('insOrderNo', $_POST)) {
-                        handleInsertOrderRequest();
-                    }
-                    
->>>>>>> refs/remotes/origin/main
                 }
 
                 disconnectFromDB();
@@ -371,7 +435,11 @@
                 if (array_key_exists('countTuples', $_GET)) {
                     handleCountRequest();
                 } else if (array_key_exists('selectQueryRequest', $_GET)){
+        
                     handleSelectRequest();
+  
+                }else if(array_key_exists('projectionQueryRequest',$_GET)){
+                    handleProjectRequest();
                 }
 
                 disconnectFromDB();
@@ -380,7 +448,7 @@
 
 		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
             handlePOSTRequest();
-        } else if (isset($_GET['countTupleRequest']) || isset($_GET['selectQueryRequest'])) {
+        } else if (isset($_GET['countTupleRequest']) || isset($_GET['selectQueryRequest']) || isset($_GET['project'])) {
             handleGETRequest();
         }
 		?>
