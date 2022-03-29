@@ -16,6 +16,12 @@
   extension.  You must also change the username and password on the
   OCILogon below to be your ORACLE username and password -->
 
+  <!-- 
+      chmod 755 ~
+      chmod 755 ~/public_html
+      chmod 755 ~/public_html/uber_dash_DBMS.php
+  -->
+
   <html>
     <head>
         <title>CPSC 304 PHP/Oracle Demonstration</title>
@@ -25,7 +31,7 @@
         <h2>Reset</h2>
         <p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
 
-        <form method="POST" action="oracle-test.php">
+        <form method="POST" action="uber_dash_DBMS.php">
             <!-- if you want another page to load after the button is clicked, you have to specify that page in the action parameter -->
             <input type="hidden" id="resetTablesRequest" name="resetTablesRequest">
             <p><input type="submit" value="Reset" name="reset"></p>
@@ -33,11 +39,13 @@
 
         <hr />
 
-        <h2>Insert Values into DemoTable</h2>
-        <form method="POST" action="oracle-test.php"> <!--refresh page when submitted-->
+        <h2>Insert Values into Customer</h2>
+        <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
             <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
-            Number: <input type="text" name="insNo"> <br /><br />
-            Name: <input type="text" name="insName"> <br /><br />
+            Account Username: <input type="text" name="insCusAU"> <br /><br />
+            Email: <input type="text" name="insCusEmail"> <br /><br />
+            Address: <input type="text" name="insCusAddr"> <br /><br />
+            Name: <input type="text" name="insCusName"> <br /><br />
 
             <input type="submit" value="Insert" name="insertSubmit"></p>
         </form>
@@ -47,7 +55,7 @@
         <h2>Update Name in DemoTable</h2>
         <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
 
-        <form method="POST" action="oracle-test.php"> <!--refresh page when submitted-->
+        <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
             <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
             Old Name: <input type="text" name="oldName"> <br /><br />
             New Name: <input type="text" name="newName"> <br /><br />
@@ -59,7 +67,7 @@
 
         <h2>Select all name in DemoTable</h2>
 
-        <form method="GET" action="oracle-test.php"> <!--refresh page when submitted-->
+        <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
             <input type="hidden" id="selectQueryRequest" name="selectQueryRequest">
             <input type="submit" value="Select" name="selectSubmit"></p>
         </form>
@@ -67,7 +75,7 @@
         <hr />
 
         <h2>Count the Tuples in DemoTable</h2>
-        <form method="GET" action="oracle-test.php"> <!--refresh page when submitted-->
+        <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
             <input type="hidden" id="countTupleRequest" name="countTupleRequest">
             <input type="submit" name="countTuples"></p>
         </form>
@@ -215,20 +223,22 @@
             OCICommit($db_conn);
         }
 
-        function handleInsertRequest() {
+        function handleInsertCusRequest() {
             global $db_conn;
 
             //Getting the values from user and insert data into the table
             $tuple = array (
-                ":bind1" => $_POST['insNo'],
-                ":bind2" => $_POST['insName']
+                ":bind1" => $_POST['insCusAU'],
+                ":bind2" => $_POST['insCusEmail'],
+                ":bind3" => $_POST['insCusAddr'],
+                ":bind4" => $_POST['insCusName']
             );
 
             $alltuples = array (
                 $tuple
             );
 
-            executeBoundSQL("insert into demoTable values (:bind1, :bind2)", $alltuples);
+            executeBoundSQL("insert into Customer values (:bind1, :bind2, :bind3, :bind4)", $alltuples);
             OCICommit($db_conn);
         }
 
@@ -251,7 +261,10 @@
                 } else if (array_key_exists('updateQueryRequest', $_POST)) {
                     handleUpdateRequest();
                 } else if (array_key_exists('insertQueryRequest', $_POST)) {
-                    handleInsertRequest();
+                    if(array_key_exists('insCusAU', $_POST)) {
+                        handleInsertCusRequest();
+                    }
+                    
                 }
 
                 disconnectFromDB();
