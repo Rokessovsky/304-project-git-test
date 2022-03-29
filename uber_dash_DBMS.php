@@ -17,14 +17,13 @@
   OCILogon below to be your ORACLE username and password -->
 
   <!-- 
-      chmod 755 ~
-      chmod 755 ~/public_html
       chmod 755 ~/public_html/uber_dash_DBMS.php
   -->
 
   <html>
     <head>
         <title>CPSC 304 PHP/Oracle Demonstration</title>
+        <link rel="stylesheet" href="style.css">
     </head>
 
     <body>
@@ -39,16 +38,48 @@
 
         <hr />
 
-        <h2>Insert Values into Customer</h2>
-        <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
-            <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
-            Account Username: <input type="text" name="insCusAU"> <br /><br />
-            Email: <input type="text" name="insCusEmail"> <br /><br />
-            Address: <input type="text" name="insCusAddr"> <br /><br />
-            Name: <input type="text" name="insCusName"> <br /><br />
+        <div class="row" name="insertRow">
+            <div class="column" name="insertCusColumn">
+                <h3>Insert Values into Customer</h3>
+                <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
+                    <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
+                    Account Username: <input type="text" name="insCusAU"> <br /><br />
+                    Email: <input type="text" name="insCusEmail"> <br /><br />
+                    Address: <input type="text" name="insCusAddr"> <br /><br />
+                    Name: <input type="text" name="insCusName"> <br /><br />
 
-            <input type="submit" value="Insert" name="insertSubmit"></p>
-        </form>
+                    <input type="submit" value="Insert" name="insertSubmit"></p>
+                </form>
+            </div>
+
+            <div class="column" name="insertFPColumn">
+                <h3>Insert Values into FoodProvider</h3>
+                <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
+                    <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
+                    Food Provider Name: <input type="text" name="insFPName"> <br /><br />
+                    Food Provider Location: <input type="text" name="insFPLoc"> <br /><br />
+                    Phone Number: <input type="text" name="insFPPhoneNo"> <br /><br />
+
+                    <input type="submit" value="Insert" name="insertSubmit"></p>
+                </form>
+            </div>
+
+            <div class="column" name="insertOrderColumn">
+                <h3>Insert Values into Order</h3>
+                <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
+                    <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
+                    Order Number: <input type="text" name="insOrderNo"> <br /><br />
+                    Order Price: <input type="text" name="insOrderPrice"> <br /><br />
+                    Order Time: <input type="text" name="insOrderTime"> <br /><br />
+                    Account Username: <input type="text" name="insOrderAU"> <br /><br />
+                    Food Provider Name: <input type="text" name="insOrderFPName"> <br /><br />
+                    Food Provider Location: <input type="text" name="insOrderFPLoc"> <br /><br />
+
+                    <input type="submit" value="Insert" name="insertSubmit"></p>
+                </form>
+            </div>
+            
+        </div>
 
         <hr />
 
@@ -223,6 +254,11 @@
             OCICommit($db_conn);
         }
 
+
+        /***
+         * 
+         * This section contains 3 functions that are handling insert operation
+         */
         function handleInsertCusRequest() {
             global $db_conn;
 
@@ -242,6 +278,45 @@
             OCICommit($db_conn);
         }
 
+        function handleInsertFPRequest() {
+            global $db_conn;
+
+            //Getting the values from user and insert data into the table
+            $tuple = array (
+                ":bind1" => $_POST['insFPName'],
+                ":bind2" => $_POST['insFPLoc'],
+                ":bind3" => $_POST['insFPPhoneNo']
+            );
+
+            $alltuples = array (
+                $tuple
+            );
+
+            executeBoundSQL("insert into FoodProvider values (:bind1, :bind2, :bind3)", $alltuples);
+            OCICommit($db_conn);
+        }
+
+        function handleInsertOrderRequest() {
+            global $db_conn;
+
+            //Getting the values from user and insert data into the table
+            $tuple = array (
+                ":bind1" => $_POST['insOrderNo'],
+                ":bind2" => $_POST['insOrderPrice'],
+                ":bind3" => $_POST['insOrderTime'],
+                ":bind4" => $_POST['insOrderAU'],
+                ":bind5" => $_POST['insOrderFPName'],
+                ":bind6" => $_POST['insOrderFPLoc']
+            );
+
+            $alltuples = array (
+                $tuple
+            );
+
+            executeBoundSQL("insert into funkyOrder values (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
+            OCICommit($db_conn);
+        }
+/////////////////////////////////////////////////////////////
         function handleCountRequest() {
             global $db_conn;
 
@@ -263,6 +338,10 @@
                 } else if (array_key_exists('insertQueryRequest', $_POST)) {
                     if(array_key_exists('insCusAU', $_POST)) {
                         handleInsertCusRequest();
+                    } else if (array_key_exists('insFPName', $_POST)) {
+                        handleInsertFPRequest();
+                    } else if (array_key_exists('insOrderNo', $_POST)) {
+                        handleInsertOrderRequest();
                     }
                     
                 }
