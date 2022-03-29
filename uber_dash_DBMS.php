@@ -64,9 +64,9 @@
                 </form>
             </div>
 
-            <div class="column" name="insertOrderColumn">
+        <!--    <div class="column" name="insertOrderColumn">
                 <h3>Insert Values into Order</h3>
-                <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
+                <form method="POST" action="uber_dash_DBMS.php">
                     <input type="hidden" id="insertQueryRequest" name="insertQueryRequest">
                     Order Number: <input type="text" name="insOrderNo"> <br /><br />
                     Order Price: <input type="text" name="insOrderPrice"> <br /><br />
@@ -78,7 +78,7 @@
                     <input type="submit" value="Insert" name="insertSubmit"></p>
                 </form>
             </div>
-            
+        -->    
         </div>
 
         <hr />
@@ -118,15 +118,34 @@
 
         <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
             <input type="hidden" id="selectQueryRequest" name="selectQueryRequest">
+            Account Username: <input type="text" name = "Username"> <br /><br />
             <input type="submit" value="Select" name="selectSubmit"></p>
         </form>
 
         <hr />
 
-        <h2>Count the Tuples in DemoTable</h2>
+        <h2>Get the customer's email and FP name from order that exceeds the specified price</h2>
+        <form method="GET" action="uber_dash_DBMS.php">
+            <input type="hidden" id="selectQueryRequest" name="selectThresholdPriceRequest">
+            Threshold Price: <input type="number" name = "ThresholdPrice"> <br /><br />
+
+            <input type="submit" value="Select" name="selectSubmit"></p>
+        </form>
+
+        <hr />
+
+        <h2>Find the Average Order Price</h2>
         <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
-            <input type="hidden" id="countTupleRequest" name="countTupleRequest">
-            <input type="submit" name="countTuples"></p>
+            <input type="hidden" id="averageOrderRequest" name="averageOrderRequest">
+            <input type="submit" value="Average Price" name="averagePrice"></p>
+        </form>
+
+        <hr />
+
+        <h2>Count Orders for each Customer</h2>
+        <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="countOrdersRequest" name="countOrdersRequest">
+            <input type="submit" value="Count Orders" name="countOrders"></p>
         </form>
 
         <?php
@@ -205,12 +224,36 @@
         }
 
         function printResult($result) { //prints results from a select statement
-            echo "<br>Retrieved data from table demoTable:<br>";
+            echo "<br>Retrieved data from table Customer:<br>";
             echo "<table>";
-            echo "<tr><th>ID</th><th>Name</th></tr>";
+            echo "<tr><th>AccountUsername</th><th>Email</th><th>Address</th><th>CustomerName</ th></tr>";
 
             while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-                echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td></tr>"; //or just use "echo $row[0]"
+                echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td><td>" . $row[3] . "</td></tr>"; //or just use "echo $row[0]"
+            }
+
+            echo "</table>";
+        }
+
+        function printCountResult($result) { //prints results from a count group by statement
+            echo "<br>Retrieved data from table Order:<br>";
+            echo "<table>";
+            echo "<tr><th>Count</th><th>AccountUsername</th></tr>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] .  "</td></tr>"; //or just use "echo $row[0]"
+            }
+
+            echo "</table>";
+        }
+
+        function printPriceResult($result) { //prints results from a threshold price statement
+            echo "<br>Retrieved data from joined tables Order x Customer x FoodProvider:<br>";
+            echo "<table>";
+            echo "<tr><th>Customer's email</th><th>FoodProvider's name</th></tr>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" .$row[0] . "</td><td>" . $row[1] . "</td></tr>";
             }
 
             echo "</table>";
@@ -289,11 +332,22 @@
             OCICommit($db_conn);
         }
 
+        function handleDeleteRequest() {
+            global $db_conn;
+
+            $username = $_POST['Username'];
+            
+            executePlainSQL("DELETE FROM Customer WHERE account_username='" . $username . "'");
+
+            OCICommit($db_conn);
+        }
+
         function handleSelectRequest() {
             global $db_conn;
 
-            // you need the wrap the old name and new name values with single quotations
-            $result = executePlainSQL("SELECT * FROM demoTable");
+            $username = $_GET['Username'];
+
+            $result = executePlainSQL("SELECT * FROM Customer WHERE account_username='" . $username . "'");
             printResult($result);
             OCICommit($db_conn);
         }
@@ -378,7 +432,34 @@
             OCICommit($db_conn);
         }
 
-        function handleInsertOrderRequest() {
+        // function handleInsertOrderRequest() {
+        //     global $db_conn;
+
+        //     //Getting the values from user and insert data into the table
+        //     $tuple = array (
+        //         ":bind1" => $_POST['insOrderNo'],
+        //         ":bind2" => $_POST['insOrderPrice'],
+        //         ":bind3" => $_POST['insOrderTime'],
+        //         ":bind4" => $_POST['insOrderAU'],
+        //         ":bind5" => $_POST['insOrderFPName'],
+        //         ":bind6" => $_POST['insOrderFPLoc']
+        //     );
+
+        //     $alltuples = array (
+        //         $tuple
+        //     );
+
+        //     executeBoundSQL("insert into funkyOrder values (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
+        //     OCICommit($db_conn);
+        // }
+/////////////////////////////////////////////////////////////
+        /**
+         * Below Are functions handling get requests
+         * 
+         */
+
+        //handle the Threshold Price request(JOIN)
+        function handleThresholdPriceRequest() {
             global $db_conn;
 
             //Getting the values from user and insert data into the table
@@ -399,15 +480,27 @@
             executeBoundSQL("insert into funkyOrder values (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
             OCICommit($db_conn);
         }
-/////////////////////////////////////////////////////////////
+        
+        //handle the average request
+        function handleAverageRequest() {
+            global $db_conn;
+
+            $result = executePlainSQL("SELECT AVG(order_price) FROM funkyOrder");
+
+            if (($row = oci_fetch_row($result)) != false) {
+                echo "<br> The average order price is: " . $row[0] . "<br>";
+            }
+            ocicommit($db_conn);
+        }
+
+
         function handleCountRequest() {
             global $db_conn;
 
-            $result = executePlainSQL("SELECT Count(*) FROM demoTable");
+            $result = executePlainSQL("SELECT COUNT(*), account_username FROM funkyOrder GROUP BY account_username");
 
-            if (($row = oci_fetch_row($result)) != false) {
-                echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
-            }
+            printCountResult($result);
+            OCICommit($db_conn);
         }
 
         // HANDLE ALL POST ROUTES
@@ -432,8 +525,8 @@
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handleGETRequest() {
             if (connectToDB()) {
-                if (array_key_exists('countTuples', $_GET)) {
-                    handleCountRequest();
+                if (array_key_exists('averagePrice', $_GET)) {
+                    handleAverageRequest();
                 } else if (array_key_exists('selectQueryRequest', $_GET)){
         
                     handleSelectRequest();
@@ -446,7 +539,7 @@
             }
         }
 
-		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
+		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['deleteSubmit'])) {
             handlePOSTRequest();
         } else if (isset($_GET['countTupleRequest']) || isset($_GET['selectQueryRequest']) || isset($_GET['project'])) {
             handleGETRequest();
