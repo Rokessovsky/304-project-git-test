@@ -117,6 +117,16 @@
 
         <hr />
 
+        <h2>Get the customer's email and FP name from order that exceeds the specified price</h2>
+        <form method="GET" action="uber_dash_DBMS.php">
+            <input type="hidden" id="selectQueryRequest" name="selectThresholdPriceRequest">
+            Threshold Price: <input type="number" name = "ThresholdPrice"> <br /><br />
+
+            <input type="submit" value="Select" name="selectSubmit"></p>
+        </form>
+
+        <hr />
+
         <h2>Find the Average Order Price</h2>
         <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
             <input type="hidden" id="averageOrderRequest" name="averageOrderRequest">
@@ -230,12 +240,24 @@
             echo "</table>";
         }
 
+        function printPriceResult($result) { //prints results from a threshold price statement
+            echo "<br>Retrieved data from joined tables Order x Customer x FoodProvider:<br>";
+            echo "<table>";
+            echo "<tr><th>Customer's email</th><th>FoodProvider's name</th></tr>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" .$row[0] . "</td><td>" . $row[1] . "</td></tr>";
+            }
+
+            echo "</table>";
+        }
+
         function connectToDB() {
             global $db_conn;
 
             // Your username is ora_(CWL_ID) and the password is a(student number). For example,
 			// ora_platypus is the username and a12345678 is the password.
-            $db_conn = OCILogon("ora_smethven", "a11305109", "dbhost.students.cs.ubc.ca:1522/stu");
+            $db_conn = OCILogon("ora_mine01", "a95135893", "dbhost.students.cs.ubc.ca:1522/stu");
 
             if ($db_conn) {
                 debugAlertMessage("Database is Connected");
@@ -369,6 +391,29 @@
         //     OCICommit($db_conn);
         // }
 /////////////////////////////////////////////////////////////
+        /**
+         * Below Are functions handling get requests
+         * 
+         */
+
+        //handle the Threshold Price request(JOIN)
+        function handleThresholdPriceRequest() {
+            global $db_conn;
+
+            $thresholdPrice = $_GET['ThresholdPrice'];
+            $result = executePlainSQL("SELECT c.email, f.food_provider_name 
+                                       FROM funkyOrder o, Customer c, FoodProvider f 
+                                       WHERE c.account_username = o.account_username 
+                                             AND f.food_provider_name = o.food_provider_name 
+                                             AND f.food_provider_location = o.food_provider_location 
+                                             AND o.order_price > " ."$thresholdPrice");
+            
+            printPriceResult($result);
+            
+            OCICommit($db_conn);
+        }
+        
+        //handle the average request
         function handleAverageRequest() {
             global $db_conn;
 
@@ -377,7 +422,9 @@
             if (($row = oci_fetch_row($result)) != false) {
                 echo "<br> The average order price is: " . $row[0] . "<br>";
             }
+            ocicommit($db_conn);
         }
+
 
         function handleCountRequest() {
             global $db_conn;
@@ -423,6 +470,8 @@
                     handleSelectRequest();
                 } else if (array_key_exists('countOrders', $_GET)){
                     handleCountRequest();
+                } else if (array_key_exists('ThresholdPrice', $_GET)) {
+                    handleThresholdPriceRequest();
                 }
 
                 disconnectFromDB();
@@ -431,7 +480,7 @@
 
 		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['deleteSubmit'])) {
             handlePOSTRequest();
-        } else if (isset($_GET['averageOrderRequest']) || isset($_GET['selectQueryRequest']) || isset($_GET['countOrdersRequest'])) {
+        } else if (isset($_GET['averageOrderRequest']) || isset($_GET['selectQueryRequest']) || isset($_GET['countOrdersRequest']) || isset($_GET['selectThresholdPriceRequest'])) {
             handleGETRequest();
         }
 		?>
