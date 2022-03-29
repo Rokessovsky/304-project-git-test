@@ -369,7 +369,7 @@
         //     OCICommit($db_conn);
         // }
 /////////////////////////////////////////////////////////////
-        function handleCountRequest() {
+        function handleAverageRequest() {
             global $db_conn;
 
             $result = executePlainSQL("SELECT AVG(order_price) FROM funkyOrder");
