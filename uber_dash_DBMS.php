@@ -117,10 +117,10 @@
 
         <hr />
 
-        <h2>Count the Tuples in DemoTable</h2>
+        <h2>Find the Average Order Price</h2>
         <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
-            <input type="hidden" id="countTupleRequest" name="countTupleRequest">
-            <input type="submit" name="countTuples"></p>
+            <input type="hidden" id="averageOrderRequest" name="averageOrderRequest">
+            <input type="submit" value="Average Price" name="averagePrice"></p>
         </form>
 
         <?php
@@ -345,17 +345,25 @@
         //         $tuple
         //     );
 
+<<<<<<< HEAD
         //     executeBoundSQL("insert into funkyOrder values (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
         //     OCICommit($db_conn);
         // }
 /////////////////////////////////////////////////////////////
         function handleCountRequest() {
+=======
+            executeBoundSQL("insert into funkyOrder values (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
+            OCICommit($db_conn);
+        }
+
+        function handleAverageRequest() {
+>>>>>>> 00b4cc79f0dcfc2cc9ea6683447a813a8b9b5892
             global $db_conn;
 
-            $result = executePlainSQL("SELECT Count(*) FROM demoTable");
+            $result = executePlainSQL("SELECT AVG(order_price) FROM funkyOrder");
 
             if (($row = oci_fetch_row($result)) != false) {
-                echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
+                echo "<br> The average order price is: " . $row[0] . "<br>";
             }
         }
 
@@ -387,8 +395,8 @@
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handleGETRequest() {
             if (connectToDB()) {
-                if (array_key_exists('countTuples', $_GET)) {
-                    handleCountRequest();
+                if (array_key_exists('averagePrice', $_GET)) {
+                    handleAverageRequest();
                 } else if (array_key_exists('selectQueryRequest', $_GET)){
                     handleSelectRequest();
                 }
@@ -399,7 +407,7 @@
 
 		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['deleteSubmit'])) {
             handlePOSTRequest();
-        } else if (isset($_GET['countTupleRequest']) || isset($_GET['selectQueryRequest'])) {
+        } else if (isset($_GET['averageOrderRequest']) || isset($_GET['selectQueryRequest'])) {
             handleGETRequest();
         }
 		?>
