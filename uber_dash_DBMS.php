@@ -123,6 +123,14 @@
             <input type="submit" value="Average Price" name="averagePrice"></p>
         </form>
 
+        <hr />
+
+        <h2>Count Orders for each Customer</h2>
+        <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="countOrdersRequest" name="countOrdersRequest">
+            <input type="submit" value="Count Orders" name="countOrders"></p>
+        </form>
+
         <?php
 		//this tells the system that it's no longer just parsing html; it's now parsing PHP
 
@@ -205,6 +213,18 @@
 
             while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
                 echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td><td>" . $row[3] . "</td></tr>"; //or just use "echo $row[0]"
+            }
+
+            echo "</table>";
+        }
+
+        function printCountResult($result) { //prints results from a count group by statement
+            echo "<br>Retrieved data from table Order:<br>";
+            echo "<table>";
+            echo "<tr><th>Count</th><th>AccountUsername</th></tr>";
+
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] .  "</td></tr>"; //or just use "echo $row[0]"
             }
 
             echo "</table>";
@@ -359,6 +379,15 @@
             }
         }
 
+        function handleCountRequest() {
+            global $db_conn;
+
+            $result = executePlainSQL("SELECT COUNT(*), account_username FROM funkyOrder GROUP BY account_username");
+
+            printCountResult($result);
+            OCICommit($db_conn);
+        }
+
         // HANDLE ALL POST ROUTES
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handlePOSTRequest() {
@@ -392,6 +421,8 @@
                     handleAverageRequest();
                 } else if (array_key_exists('selectQueryRequest', $_GET)){
                     handleSelectRequest();
+                } else if (array_key_exists('countOrders', $_GET)){
+                    handleCountRequest();
                 }
 
                 disconnectFromDB();
@@ -400,7 +431,7 @@
 
 		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['deleteSubmit'])) {
             handlePOSTRequest();
-        } else if (isset($_GET['averageOrderRequest']) || isset($_GET['selectQueryRequest'])) {
+        } else if (isset($_GET['averageOrderRequest']) || isset($_GET['selectQueryRequest']) || isset($_GET['countOrdersRequest'])) {
             handleGETRequest();
         }
 		?>
