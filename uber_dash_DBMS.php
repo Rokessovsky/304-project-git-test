@@ -368,7 +368,7 @@
         //     executeBoundSQL("insert into funkyOrder values (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
         //     OCICommit($db_conn);
         // }
-
+/////////////////////////////////////////////////////////////
         function handleAverageRequest() {
             global $db_conn;
 
@@ -401,9 +401,10 @@
                         handleInsertCusRequest();
                     } else if (array_key_exists('insFPName', $_POST)) {
                         handleInsertFPRequest();
-                    } else if (array_key_exists('insOrderNo', $_POST)) {
-                        handleInsertOrderRequest();
-                    }
+                    } 
+                    // else if (array_key_exists('insOrderNo', $_POST)) {
+                    //     handleInsertOrderRequest();
+                    // }
                 } else if (array_key_exists('deleteQueryRequest', $_POST)){
                     handleDeleteRequest();
                 }
