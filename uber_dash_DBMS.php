@@ -107,10 +107,11 @@
 
         <hr />
 
-        <h2>Select all name in DemoTable</h2>
+        <h2>Select Customer by Account Username</h2>
 
         <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
             <input type="hidden" id="selectQueryRequest" name="selectQueryRequest">
+            Account Username: <input type="text" name = "Username"> <br /><br />
             <input type="submit" value="Select" name="selectSubmit"></p>
         </form>
 
@@ -198,12 +199,12 @@
         }
 
         function printResult($result) { //prints results from a select statement
-            echo "<br>Retrieved data from table demoTable:<br>";
+            echo "<br>Retrieved data from table Customer:<br>";
             echo "<table>";
-            echo "<tr><th>ID</th><th>Name</th></tr>";
+            echo "<tr><th>AccountUsername</th><th>Email</th><th>Address</th><th>CustomerName</ th></tr>";
 
             while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-                echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td></tr>"; //or just use "echo $row[0]"
+                echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td><td>" . $row[3] . "</td></tr>"; //or just use "echo $row[0]"
             }
 
             echo "</table>";
@@ -267,8 +268,9 @@
         function handleSelectRequest() {
             global $db_conn;
 
-            // you need the wrap the old name and new name values with single quotations
-            $result = executePlainSQL("SELECT * FROM demoTable");
+            $username = $_GET['Username'];
+
+            $result = executePlainSQL("SELECT * FROM Customer WHERE account_username='" . $username . "'");
             printResult($result);
             OCICommit($db_conn);
         }
