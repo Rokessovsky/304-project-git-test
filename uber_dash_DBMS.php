@@ -97,6 +97,16 @@
 
         <hr />
 
+        <h2>Delete Customer Info</h2>
+
+        <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="deleteQueryRequest" name="deleteQueryRequest">
+            Account Username: <input type="text" name="Username"> <br /><br />
+            <input type="submit" value="Delete" name="deleteSubmit"></p>
+        </form>
+
+        <hr />
+
         <h2>Select all name in DemoTable</h2>
 
         <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
@@ -244,6 +254,16 @@
             OCICommit($db_conn);
         }
 
+        function handleDeleteRequest() {
+            global $db_conn;
+
+            $username = $_POST['Username'];
+            
+            executePlainSQL("DELETE FROM Customer WHERE account_username='" . $username . "'");
+
+            OCICommit($db_conn);
+        }
+
         function handleSelectRequest() {
             global $db_conn;
 
@@ -348,16 +368,13 @@
                 } else if (array_key_exists('insertQueryRequest', $_POST)) {
                     if(array_key_exists('insCusAU', $_POST)) {
                         handleInsertCusRequest();
-<<<<<<< HEAD
-                    }                   
-=======
                     } else if (array_key_exists('insFPName', $_POST)) {
                         handleInsertFPRequest();
                     } else if (array_key_exists('insOrderNo', $_POST)) {
                         handleInsertOrderRequest();
                     }
-                    
->>>>>>> refs/remotes/origin/main
+                } else if (array_key_exists('deleteQueryRequest', $_POST)){
+                    handleDeleteRequest();
                 }
 
                 disconnectFromDB();
@@ -378,7 +395,7 @@
             }
         }
 
-		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit'])) {
+		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['deleteSubmit'])) {
             handlePOSTRequest();
         } else if (isset($_GET['countTupleRequest']) || isset($_GET['selectQueryRequest'])) {
             handleGETRequest();
