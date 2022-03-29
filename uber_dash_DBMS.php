@@ -52,14 +52,15 @@
 
         <hr />
 
-        <h2>Update Name in DemoTable</h2>
-        <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
+        <h2>Update Customer Info</h2>
+        <p>If you don't want to change a value, leave the field as blank</p>
 
         <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
             <input type="hidden" id="updateQueryRequest" name="updateQueryRequest">
-            Old Name: <input type="text" name="oldName"> <br /><br />
+            Account Username: <input type="text" name="Username"> <br /><br />
+            New Email: <input type="text" name="newEmail"> <br /><br />
+            New Address:<input type="text" name="newAddress"> <br /><br />
             New Name: <input type="text" name="newName"> <br /><br />
-
             <input type="submit" value="Update" name="updateSubmit"></p>
         </form>
 
@@ -195,11 +196,20 @@
         function handleUpdateRequest() {
             global $db_conn;
 
-            $old_name = $_POST['oldName'];
+            $username = $_POST['Username'];
+            $new_email = $_POST['newEmail'];
+            $new_address = $_POST['newAddress'];
             $new_name = $_POST['newName'];
-
-            // you need the wrap the old name and new name values with single quotations
-            executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
+            //if user leave a field as blank, don't update
+            if(isset($new_email) && trim($new_email) != ''){
+                executePlainSQL("UPDATE Customer SET email='" . $new_email . "' WHERE account_username='".$username."'");
+            }
+            if(isset($new_address) && trim($new_address) != ''){
+                executePlainSQL("UPDATE Customer SET address='" . $new_address . "' WHERE account_username='".$username."'");
+            }
+            if(isset($new_name) && trim($new_name) != ''){
+                executePlainSQL("UPDATE Customer SET customer_name='" . $new_name . "' WHERE account_username='".$username."'");
+            }
             OCICommit($db_conn);
         }
 
@@ -263,8 +273,7 @@
                 } else if (array_key_exists('insertQueryRequest', $_POST)) {
                     if(array_key_exists('insCusAU', $_POST)) {
                         handleInsertCusRequest();
-                    }
-                    
+                    }                   
                 }
 
                 disconnectFromDB();
