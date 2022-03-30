@@ -22,21 +22,20 @@
 
   <html>
     <head>
-        <title>CPSC 304 PHP/Oracle Demonstration</title>
+        <title>Uber Dash DBMS</title>
         <link rel="stylesheet" href="style.css">
     </head>
 
     <body>
-        <h2>Reset</h2>
+        <!-- <h2>Reset</h2>
         <p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
 
         <form method="POST" action="uber_dash_DBMS.php">
-            <!-- if you want another page to load after the button is clicked, you have to specify that page in the action parameter -->
             <input type="hidden" id="resetTablesRequest" name="resetTablesRequest">
             <p><input type="submit" value="Reset" name="reset"></p>
         </form>
 
-        <hr />
+        <hr /> -->
 
         <div class="row" name="insertRow">
             <div class="column" name="insertCusColumn">
@@ -153,6 +152,14 @@
         <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
             <input type="hidden" id="countOrdersRequest" name="countOrdersRequest">
             <input type="submit" value="Count Orders" name="countOrders"></p>
+        </form>
+
+        <hr />
+
+        <h2>Find the Most Orders Made by a Single Customer</h2>
+        <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="maxOrdersRequest" name="maxOrdersRequest">
+            <input type="submit" value="Most Orders" name="maxOrders"></p>
         </form>
 
         <?php
@@ -387,16 +394,16 @@
             OCICommit($db_conn);
         }
 
-        function handleResetRequest() {
-            global $db_conn;
-            // Drop old table
-            executePlainSQL("DROP TABLE demoTable");
+        // function handleResetRequest() {
+        //     global $db_conn;
+        //     // Drop old table
+        //     executePlainSQL("DROP TABLE demoTable");
 
-            // Create new table
-            echo "<br> creating new table <br>";
-            executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-            OCICommit($db_conn);
-        }
+        //     // Create new table
+        //     echo "<br> creating new table <br>";
+        //     executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
+        //     OCICommit($db_conn);
+        // }
 
 
         /***
@@ -523,7 +530,18 @@
             $result = executePlainSQL("SELECT COUNT(*), account_username FROM funkyOrder GROUP BY account_username");
 
             printCountResult($result);
-            OCICommit($db_conn);
+           //  OCICommit($db_conn);
+        }
+
+        function handleMaxOrdersRequest() {
+            global $db_conn;
+
+            $result = executePlainSQL(" SELECT MAX(ocount) FROM (SELECT COUNT(*) as ocount, account_username FROM funkyOrder GROUP BY account_username)");
+
+            if (($row = oci_fetch_row($result)) != false) {
+                echo "<br> The Most Orders Made was: " . $row[0] . "<br>";
+            }
+           //  OCICommit($db_conn);
         }
 
         // HANDLE ALL POST ROUTES
@@ -562,6 +580,8 @@
   
                 }else if(array_key_exists('projectionQueryRequest',$_GET)){
                     handleProjectRequest();
+                } else if (array_key_exists('maxOrders', $_GET)){
+                    handleMaxOrdersRequest();
                 }
 
                 disconnectFromDB();
@@ -570,7 +590,7 @@
 
 		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['deleteSubmit'])) {
             handlePOSTRequest();
-        } else if (isset($_GET['project']) || isset($_GET['obtainCusWhoOrderAllRequest']) || isset($_GET['averageOrderRequest']) || isset($_GET['selectQueryRequest']) || isset($_GET['countOrdersRequest']) || isset($_GET['selectThresholdPriceRequest'])) {
+        } else if (isset($_GET['project']) || isset($_GET['obtainCusWhoOrderAllRequest']) || isset($_GET['averageOrderRequest']) || isset($_GET['selectQueryRequest']) || isset($_GET['countOrdersRequest']) || isset($_GET['maxOrdersRequest']) || isset($_GET['selectThresholdPriceRequest'])) {
             handleGETRequest();
         }
 		?>
