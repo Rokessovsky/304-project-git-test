@@ -495,7 +495,11 @@
                                                                                  AND f.food_provider_location =  o.food_provider_location
                                                                                  AND c.account_username = o.account_username))");
             $row = oci_fetch_row($result);
-            echo "<br> The customers that have ordered from all food providers are: <br>" ."$row";
+            echo "<br> The customers that have ordered from all food providers are: <br>";
+            foreach ($row as $value) {
+                echo "$value";
+
+            }
             
         }
         
