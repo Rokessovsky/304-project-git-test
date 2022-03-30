@@ -114,7 +114,7 @@
         </form>   
         <hr />
 
-        <h2>Select all name in DemoTable</h2>
+        <h2>Retrieve data from Customer table</h2>
 
         <form method="GET" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
             <input type="hidden" id="selectQueryRequest" name="selectQueryRequest">
@@ -232,11 +232,12 @@
 
         function printResult($result) { //prints results from a select statement
             echo "<br>Retrieved data from table Customer:<br>";
+            echo "<table>";
+            echo "<tr><th>AccountUsername</th><th>Email</th><th>Address</th><th>CustomerName</th></tr>";
             
-            echo "<tr><th>AccountUsername</th><th>Email</th><th>Address</th><th>CustomerName</ th></tr>";
 
             while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-                echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td><td>" . $row[3] . "</td></tr>"; //or just use "echo $row[0]"
+                echo "<tr><td>" . $row[0] . "</td><td>" . $row[1] . "</td><td>" . $row[2] . "</td><td>" . $row[3] . "</td></tr>\n"; //or just use "echo $row[0]"
             }
 
             echo "</table>";
