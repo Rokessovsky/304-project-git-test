@@ -30,6 +30,7 @@ INSERT INTO Customer VALUES ('Skye321', 'skye321@gmail.com','6245 Agronomy Rd','
 INSERT INTO Customer VALUES ('Charlie5', 'charlie5@gmail.com','2335 Engineering Rd', 'Charlie');
 INSERT INTO Customer VALUES ('RaymondGod', 'RaymondGod304@gmail.com','2036 Main Mall', 'Raymond');
 INSERT INTO Customer VALUES ('MohammedLee', 'theMostCommonName@gmail.com','2366 Main Mall', 'MohammedLee');
+-- a customer who has not placed any orders (yet)
 INSERT INTO Customer VALUES ('JustBrian', 'charlie5@gmail.com','2011 University Blvd', 'Brian Justin Crum');
 
 INSERT INTO FoodProvider VALUES ('McDonalds', '5728 University Blvd #101, Vancouver','6042212570');
@@ -38,6 +39,8 @@ INSERT INTO FoodProvider VALUES ('The Keg Steakhouse + Bar', '688 Dunsmuir St., 
 INSERT INTO FoodProvider VALUES ('The Home Depot', '3950 Henning Dr, Burnaby', '6042943030');
 INSERT INTO FoodProvider VALUES ('Pho 37','8328 Capstan Way #1101, Richmond','6044475158');
 INSERT INTO FoodProvider VALUES ('Cactus Club Richmond Centre','6511 No.3 Rd #1666, Richmond','6042449969');
+-- a food provider that does not have any orders placed (yet)
+INSERT INTO FoodProvider VALUES ('Taco Time', '1234 Fake Street', '6041234567');
 
 INSERT INTO funkyOrder VALUES('1000000', 39.50, TO_TIMESTAMP('2022-03-03 13:23:44', 'YYYY-MM-DD HH24:MI:SS'),'Ellen123', 'McDonalds', '5728 University Blvd #101, Vancouver');
 INSERT INTO funkyOrder VALUES('1000001', 40.01, TO_TIMESTAMP('2022-03-03 20:23:12', 'YYYY-MM-DD HH24:MI:SS'),'Skye321', 'McDonalds', '5728 University Blvd #101, Vancouver');
