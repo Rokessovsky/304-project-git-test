@@ -555,6 +555,8 @@
                 } else if (array_key_exists('insertQueryRequest', $_POST)) {
                     if(array_key_exists('insCusAU', $_POST)) {
                         handleInsertCusRequest();
+                    } else if (array_key_exists('insFPName', $_POST)){
+                        handleInsertFPRequest();
                     }                   
                 }
 
