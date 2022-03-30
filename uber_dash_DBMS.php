@@ -117,7 +117,7 @@
 
         <hr />
 
-        <h2>Get the customer's email and FP name from order that exceeds the specified price</h2>
+        <h2>(JOIN)Get the CUSTOMER'S EMAIL and FP NAME from order that exceeds the specified price</h2>
         <form method="GET" action="uber_dash_DBMS.php">
             <input type="hidden" id="selectQueryRequest" name="selectThresholdPriceRequest">
             Threshold Price: <input type="number" name = "ThresholdPrice"> <br /><br />
@@ -133,6 +133,13 @@
             <input type="submit" value="Average Price" name="averagePrice"></p>
         </form>
 
+        <hr />
+        <h2> (DIVISION)Find Customer Who Have Ordered From EVERY Food Provider
+        <form method="GET" action="uber_dash_DBMS.php">
+            <input type="hidden" id="averageOrderRequest" name="obtainCusWhoOrderAllRequest">
+            <input type="submit" value="big stomach customer" name="OrderedAll"></p>
+        </form>
+        
         <hr />
 
         <h2>Count Orders for each Customer</h2>
@@ -410,7 +417,26 @@
             
             printPriceResult($result);
             
-            OCICommit($db_conn);
+            //OCICommit($db_conn);
+        }
+
+        function handleOrderedAllRequest() {
+            global $db_conn;
+            
+            $result = executePlainSQL("SELECT account_username
+                                       FROM Customer c
+                                       WHERE NOT EXISTS (SELECT f.Food_provider_name,f.food_provider_position
+                                                         FROM FoodProvider f
+                                                         WHERE NOT EXISTS (SELECT o.food_provider_name,o.food_provider_position
+                                                                           FROM Order o
+                                                                           WHERE f.food_provider_name = o.food_provider_name
+                                                                                 AND f.food_provider_location =  o.food_provider_location
+                                                                                 AND c.account_username = o.account_username))");
+            echo "<br> The customers that have ordered from all food providers are: <br>";
+            echo "<tr><th>AccountUsername</th></tr>";
+            while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                echo "<tr><td>" .$row[0]."</td></tr>";
+            }
         }
         
         //handle the average request
@@ -422,7 +448,7 @@
             if (($row = oci_fetch_row($result)) != false) {
                 echo "<br> The average order price is: " . $row[0] . "<br>";
             }
-            ocicommit($db_conn);
+            //ocicommit($db_conn);
         }
 
 
@@ -472,6 +498,8 @@
                     handleCountRequest();
                 } else if (array_key_exists('ThresholdPrice', $_GET)) {
                     handleThresholdPriceRequest();
+                } else if (array_key_exists("OrderedAll", $_GET)) {
+                    handleOrderedAllRequest();
                 }
 
                 disconnectFromDB();
@@ -480,7 +508,7 @@
 
 		if (isset($_POST['reset']) || isset($_POST['updateSubmit']) || isset($_POST['insertSubmit']) || isset($_POST['deleteSubmit'])) {
             handlePOSTRequest();
-        } else if (isset($_GET['averageOrderRequest']) || isset($_GET['selectQueryRequest']) || isset($_GET['countOrdersRequest']) || isset($_GET['selectThresholdPriceRequest'])) {
+        } else if (isset($_GET['obtainCusWhoOrderAllRequest']) || isset($_GET['averageOrderRequest']) || isset($_GET['selectQueryRequest']) || isset($_GET['countOrdersRequest']) || isset($_GET['selectThresholdPriceRequest'])) {
             handleGETRequest();
         }
 		?>
