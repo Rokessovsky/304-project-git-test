@@ -63,6 +63,16 @@
                 </form>
             </div>
 
+            <hr />
+
+        <h2>Delete Customer Info</h2>
+
+        <form method="POST" action="uber_dash_DBMS.php"> <!--refresh page when submitted-->
+            <input type="hidden" id="deleteQueryRequest" name="deleteQueryRequest">
+            Account Username: <input type="text" name="Username"> <br /><br />
+            <input type="submit" value="Delete" name="deleteSubmit"></p>
+        </form>
+
         <!--    <div class="column" name="insertOrderColumn">
                 <h3>Insert Values into Order</h3>
                 <form method="POST" action="uber_dash_DBMS.php">
@@ -548,8 +558,8 @@
 	// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
         function handlePOSTRequest() {
             if (connectToDB()) {
-                if (array_key_exists('resetTablesRequest', $_POST)) {
-                    handleResetRequest();
+                if (array_key_exists('deleteQueryRequest', $_POST)) {
+                    handleDeleteRequest();
                 } else if (array_key_exists('updateQueryRequest', $_POST)) {
                     handleUpdateRequest();
                 } else if (array_key_exists('insertQueryRequest', $_POST)) {

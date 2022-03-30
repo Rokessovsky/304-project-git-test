@@ -40,7 +40,7 @@ INSERT INTO FoodProvider VALUES ('The Home Depot', '3950 Henning Dr, Burnaby', '
 INSERT INTO FoodProvider VALUES ('Pho 37','8328 Capstan Way #1101, Richmond','6044475158');
 INSERT INTO FoodProvider VALUES ('Cactus Club Richmond Centre','6511 No.3 Rd #1666, Richmond','6042449969');
 -- a food provider that does not have any orders placed (yet)
-INSERT INTO FoodProvider VALUES ('Taco Time', '1234 Fake Street', '6041234567');
+-- INSERT INTO FoodProvider VALUES ('Taco Time', '1234 Fake Street', '6041234567');
 
 INSERT INTO funkyOrder VALUES('1000000', 39.50, TO_TIMESTAMP('2022-03-03 13:23:44', 'YYYY-MM-DD HH24:MI:SS'),'Ellen123', 'McDonalds', '5728 University Blvd #101, Vancouver');
 INSERT INTO funkyOrder VALUES('1000001', 40.01, TO_TIMESTAMP('2022-03-03 20:23:12', 'YYYY-MM-DD HH24:MI:SS'),'Skye321', 'McDonalds', '5728 University Blvd #101, Vancouver');
